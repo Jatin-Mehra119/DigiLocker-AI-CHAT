@@ -1,0 +1,4 @@
+crawl4ai
+streamlit
+sentence_transformers
+faiss-cpu
