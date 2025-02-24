@@ -1,7 +1,7 @@
 import streamlit as st
 import asyncio
 from vector_database import VectorDatabase
-from web_crawler import fetch_data
+from web_crawler import fetch_data, fetch_using_LLM
 import PyPDF2
 
 # Initialize Vector Database
@@ -18,7 +18,7 @@ def main():
     
     if st.button("Crawl"):
         with st.spinner("Fetching data..."):
-            result = asyncio.run(fetch_data(url))
+            result = asyncio.run(fetch_using_LLM(url))
             st.markdown(result)
             vector_db.add_data([result])
             st.success("Data successfully stored in FAISS!")
