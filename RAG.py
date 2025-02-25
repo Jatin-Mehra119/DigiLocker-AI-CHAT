@@ -4,6 +4,7 @@ import asyncio
 import os
 import dotenv
 import tiktoken
+import streamlit as st
 
 dotenv.load_dotenv()
 
@@ -58,14 +59,68 @@ class LLM:
         return response.choices[0].message.content
 
 async def main():
-    query = input("Please enter your query: ")
-    # Retrieve context using the search engine (default returns 5 results)
-    search_results = search_engine.search(query) 
-    # If no results found, use an empty string for context.
-    context = search_results if search_results else [{"text": ""}]
-    llm = LLM()
-    response = await llm.generate_response(context, query)
-    print("Response:\n", response)
+    st.title("Digi Locker AI Chatbot Expert")
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.image("https://img1.digitallocker.gov.in/digilocker-landing-page/assets/img/DigilockerLogo.svg", width=200)
+    with col2:
+        st.image("https://www.digilocker.gov.in/assets/img/chat-bot.svg", width=50)
+    
+    # Initialize chat history in session state if it doesn't exist
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+        
+    # Display chat history
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    
+    # Chat input
+    if prompt := st.chat_input("Ask something about DigiLocker..."):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        # Display user message
+        with st.chat_message("user"):
+            st.markdown(prompt)
+            
+        # Get response
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            message_placeholder.markdown("Thinking...")
+            
+            try:
+                # Retrieve context using the search engine
+                search_results = search_engine.search(prompt)
+                context = search_results if search_results else [{"text": ""}]
+                
+                # Generate response
+                llm = LLM()
+                response = await llm.generate_response(context, prompt)
+                message_placeholder.markdown(response)
+                
+                # Add assistant response to chat history
+                st.session_state.messages.append({"role": "assistant", "content": response})
+            
+            except Exception as e:
+                error_message = "I apologize, but I encountered an issue processing your request."
+                
+                # Handle specific exceptions with friendly messages
+                if "token" in str(e).lower():
+                    error_message = "Something went wrong! The query used too many tokens."
+                elif "api" in str(e).lower():
+                    error_message = "I'm having trouble connecting to my knowledge base. Please try again later."
+                elif "timeout" in str(e).lower():
+                    error_message = "The request timed out. Please try a shorter or simpler question."
+                
+                # Log the actual error for debugging (won't be visible to users)
+                print(f"Error generating response: {str(e)}")
+                
+                # Display the user-friendly error message
+                message_placeholder.markdown(error_message)
+                
+                # Add error message to chat history
+                st.session_state.messages.append({"role": "assistant", "content": error_message})
 
 if __name__ == "__main__":
     asyncio.run(main())

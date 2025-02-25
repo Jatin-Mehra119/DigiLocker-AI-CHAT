@@ -2,3 +2,5 @@ crawl4ai
 streamlit
 sentence_transformers
 faiss-cpu
+PyPDF2
+groq
