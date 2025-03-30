@@ -1,11 +1,19 @@
 # DigiLocker RAG Chatbot Project
-
+- [AI CHAT BOT](https://digilocker-ai-chat.streamlit.app/)
 ## Overview
 This project crawls websites and processes PDFs to build a knowledge base in a FAISS vector database, then powers a RAG chat app for DigiLocker Q&A.
+
+## Technology
+- Web Scraping powered by AI (Crawl4ai)
+- Knowledge Base (Faiss by Facebook)
+- AI insights from GROQ APIs.
+- Frontend Streamlit UI
+- Pdf processing using PyPDF2
 
 ```
 GOV/
 ├── apps/
+│   ├── data_collector_app.py/# Website crawler/scraper using crawl4ai
 │   └── rag_chat_app.py       # Main Streamlit application
 ├── data/
 │   ├── crawled/              # Crawled website data
@@ -24,5 +32,5 @@ GOV/
 └── README.md                 # Project documentation
 ```
 
-- Acknowledgments
-DigiLocker for providing the official documentation
+### Acknowledgments
+- DigiLocker for providing the official documentation.
